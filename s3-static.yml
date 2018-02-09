@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: S3 Static Site
+Parameters:
+  NameBucket:
+    Type: String
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      BucketName: !Ref NameBucket
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    #DeletionPolicy: Retain
+Outputs:
+  S3BucketName:
+    Value: !Ref NameBucket
+    Description: Name for bucket on S3    
+  WebsiteURL:
+    Value: !GetAtt [Bucket, WebsiteURL]
+    Description: URL for website hosted on S3
+  S3BucketSecureURL:
+    Value: !Join ['', ['https://', !GetAtt [Bucket, DomainName]]]
+    Description: Name of S3 bucket to hold website content
+    

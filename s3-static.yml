@@ -4,6 +4,32 @@ Description: S3 Static Site
 Parameters:
   NameBucket:
     Type: String
+Mappings:
+  RegionMap:
+    us-east-1:
+      hostedzoneID: Z3AQBSTGFYJSTF
+      websiteendpoint: s3-website-us-east-1.amazonaws.com
+    us-west-1:
+      hostedzoneID: Z2F56UZL2M1ACD
+      websiteendpoint: s3-website-us-west-1.amazonaws.com
+    us-west-2:
+      hostedzoneID: Z3BJ6K6RIION7M
+      websiteendpoint: s3-website-us-west-2.amazonaws.com
+    eu-west-1:
+      hostedzoneID: Z1BKCTXD74EZPE
+      websiteendpoint: s3-website-eu-west-1.amazonaws.com
+    ap-southeast-1:
+      hostedzoneID: Z3O0J2DXBE1FTB
+      websiteendpoint: s3-website-ap-southeast-1.amazonaws.com
+    ap-southeast-2:
+      hostedzoneID: Z1WCIGYICN2BYD
+      websiteendpoint: s3-website-ap-southeast-2.amazonaws.com
+    ap-northeast-1:
+      hostedzoneID: Z2M4EHUR26P7ZW
+      websiteendpoint: s3-website-ap-northeast-1.amazonaws.com
+    sa-east-1:
+      hostedzoneID: Z31GFT0UA1I2HV
+      websiteendpoint: s3-website-sa-east-1.amazonaws.com
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -45,10 +71,15 @@ Outputs:
   S3BucketName:
     Value: !Ref NameBucket
     Description: Name for bucket on S3    
-  WebsiteURL:
+  S3WebsiteURL:
     Value: !GetAtt [S3Bucket, WebsiteURL]
     Description: URL for website hosted on S3
   S3BucketSecureURL:
     Value: !Join ['', ['https://', !GetAtt [S3Bucket, DomainName]]]
     Description: Name of S3 bucket to hold website content
-    
+  S3HostedZoneID:
+    Value: !FindInMap [ RegionMap, !Ref 'AWS::Region', hostedzoneID]
+    Description: Name of S3 bucket to hold website content
+  S3DNSName:
+    Value: !FindInMap [ RegionMap, !Ref 'AWS::Region', websiteendpoint]
+    Description: Name of S3 bucket to hold website content

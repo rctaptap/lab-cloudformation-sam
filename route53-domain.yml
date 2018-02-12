@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Route53 to Static Site
+Parameters:
+  R53DomainName:
+    Description: Domain name for your website (example.com)
+    Type: String
+  R53HostedZoneId:
+    Description: Domain name for your website (example.com)
+    Type: String
+  R53DNSName:
+    Description: Domain name for your website (example.com)
+    Type: String
+  R53WWWDNSName:
+    Description: Domain name for your website (example.com)
+    Type: String
+Resources:
+  myDNS:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: !Ref R53DomainName
+      Comment: Zone apex alias.
+      RecordSets:
+      - Name: !Ref R53DomainName
+        Type: A
+        AliasTarget:
+          HostedZoneId: !Ref R53HostedZoneId
+          DNSName: !Ref R53DNSName
+      - Name: !Sub
+            - www.${Domain}
+            - Domain: !Ref R53DomainName
+        Type: A
+        AliasTarget:
+          HostedZoneId: !Ref R53HostedZoneId
+          DNSName: !Ref R53WWWDNSName

@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  Domain:
+    Type: String
+  Subdomain:
+    Type: String
+Resources:
+  myStackS3:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3-eu-west-1.amazonaws.com/infraestructura.dev/cloudformation/infraestructura/roberto/route53-domain.yml
+      Parameters:
+        InstanceType: t1.micro
+        KeyName: mykey
+  myStackRoute53:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: myStackS3
+    Properties:
+      TemplateURL: https://s3-eu-west-1.amazonaws.com/infraestructura.dev/cloudformation/infraestructura/roberto/s3-static.yml
+      Parameters:
+        InstanceType: t1.micro
+        KeyName: mykey
+Outputs:
+  StackRef:
+    Value: !Ref myStack
+  OutputFromNestedStack:
+    Value: !GetAtt myStack.Outputs.BucketName

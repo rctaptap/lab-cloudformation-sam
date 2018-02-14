@@ -1,35 +1,46 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
 Description: Route53 to Static Site
 Parameters:
   R53DomainName:
     Description: Domain name for your website (example.com)
     Type: String
+    Default: orbis.pe
+  R53SubDomainName:
+    Description: Sub Domain name for your website (example.com)
+    Type: String
+    Default: rc
   R53HostedZoneId:
     Description: Domain name for your website (example.com)
     Type: String
-  R53DNSName:
+    Defautl: Z11RQHUD4WPH24
+  ExtHostedZoneId:
     Description: Domain name for your website (example.com)
     Type: String
-  R53WWWDNSName:
+    Default: Z2FDTNDATAQYW2
+  ExtDNSName:
     Description: Domain name for your website (example.com)
     Type: String
 Resources:
   myDNS:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneName: !Ref R53DomainName
+      HostedZoneId: !Ref R53HostedZoneId
       Comment: Zone apex alias.
       RecordSets:
-      - Name: !Ref R53DomainName
+      - Name: !Join 
+        - '.'
+        - - !Ref R53SubDomainName
+          - !Ref R53DomainName
         Type: A
         AliasTarget:
-          HostedZoneId: !Ref R53HostedZoneId
-          DNSName: !Ref R53DNSName
+          HostedZoneId: !Ref ExtHostedZoneId
+          DNSName: !Ref ExtDNSName
       - Name: !Sub
             - www.${Domain}
-            - Domain: !Ref R53DomainName
+            - Domain: !Join 
+              - '.'
+              - - !Ref R53SubDomainName
+                - !Ref R53DomainName
         Type: A
         AliasTarget:
-          HostedZoneId: !Ref R53HostedZoneId
-          DNSName: !Ref R53WWWDNSName
+          HostedZoneId: !Ref ExtHostedZoneId
+          DNSName: !Ref ExtDNSName

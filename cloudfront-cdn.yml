@@ -1,22 +1,43 @@
-AWSTemplateFormatVersion: 2010-09-09
+Description: CloudFront Static Site
+Parameters:
+  CFOrigin:
+    Type: String
+  CFAlias:
+    Type: String
+Mappings:
+  RegionMap:
+    us-east-1:
+      hostedzoneID: Z2FDTNDATAQYW2
+      websiteendpoint: cloudfront.amazonaws.com
 Resources:
   cloudfrontdistribution:
     Type: 'AWS::CloudFront::Distribution'
     Properties:
       DistributionConfig:
-        CacheBehaviors:
-          - LambdaFunctionAssociations:
-              - EventType: string-value
-                LambdaFunctionARN: string-value
-        DefaultCacheBehavior:
-          LambdaFunctionAssociations:
-            - EventType: string-value
-              LambdaFunctionARN: string-value
-        IPV6Enabled: boolean-value
         Origins:
-          - CustomOriginConfig:
-              OriginKeepaliveTimeout: integer-value
-              OriginReadTimeout: integer-value
-      Tags:
-        - Key: string-value
-          Value: string-value
+          DomainName: !Ref CFOrigin
+        Aliases: !Ref CFAlias
+        PriceClass: PriceClass_100
+        DefaultCacheBehavior: 
+          ViewerProtocolPolicy: allow-all
+          AllowedMethods: ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+          Compress: false
+          DefaultTTL: 
+          ForwardedValues: 
+            Cookies: 
+              Forward: all
+            Headers: ["*"]
+        IPV6Enabled: false
+Outputs:
+  CFOrigins:
+    Value: !Ref CFOrigin
+    Description: CloudFront Origin
+  CFDomainName:
+    Value: !GetAtt [cloudfrontdistribution, DomainName]
+    Description: URL for website hosted on S3
+  CFHostedZoneID:
+    Value: !FindInMap [ RegionMap, "us-east-1", hostedzoneID]
+    Description: Name of S3 bucket to hold website content
+  CFwebsiteendpoint:
+    Value: !FindInMap [ RegionMap, "us-east-1", websiteendpoint]
+    Description: Name of S3 bucket to hold website content

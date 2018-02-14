@@ -1,9 +1,8 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
 Description: S3 Static Site
 Parameters:
   NameBucket:
     Type: String
+    Default: rc.orbis.pe
 Mappings:
   RegionMap:
     us-east-1:
@@ -74,8 +73,8 @@ Outputs:
   S3WebsiteURL:
     Value: !GetAtt [S3Bucket, WebsiteURL]
     Description: URL for website hosted on S3
-  S3BucketSecureURL:
-    Value: !Join ['', ['https://', !GetAtt [S3Bucket, DomainName]]]
+  S3BucketDomainName:
+    Value:  !GetAtt [S3Bucket, DomainName]
     Description: Name of S3 bucket to hold website content
   S3HostedZoneID:
     Value: !FindInMap [ RegionMap, !Ref 'AWS::Region', hostedzoneID]

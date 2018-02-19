@@ -1,4 +1,4 @@
-Description: Route53 to Static Site
+Description: Registrar un dominio y www
 Parameters:
   R53DomainName:
     Description: Domain name for your website (example.com)

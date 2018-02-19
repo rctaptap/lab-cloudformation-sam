@@ -1,4 +1,4 @@
-Description: CloudFront Static Site
+Description: CloudFront para un sitio estatico
 Parameters:
   CFOrigin:
     Type: String
@@ -11,33 +11,50 @@ Mappings:
       websiteendpoint: cloudfront.amazonaws.com
 Resources:
   cloudfrontdistribution:
-    Type: 'AWS::CloudFront::Distribution'
+    Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Origins:
-          DomainName: !Ref CFOrigin
-        Aliases: !Ref CFAlias
-        PriceClass: PriceClass_100
-        DefaultCacheBehavior: 
+        - DomainName: !Ref CFOrigin
+          Id: myS3Origin
+          S3OriginConfig:
+            OriginAccessIdentity: ''
+        Enabled: 'true'
+        Comment: Some comment
+        DefaultRootObject: index.html
+        Aliases: 
+        - !Ref CFAlias
+        - !Sub
+          - www.${Domain}
+          - Domain: !Ref CFAlias
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          TargetOriginId: myS3Origin
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: none
           ViewerProtocolPolicy: allow-all
-          AllowedMethods: ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-          Compress: false
-          DefaultTTL: 
-          ForwardedValues: 
-            Cookies: 
-              Forward: all
-            Headers: ["*"]
-        IPV6Enabled: false
+        PriceClass: PriceClass_200
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
 Outputs:
   CFOrigins:
     Value: !Ref CFOrigin
     Description: CloudFront Origin
   CFDomainName:
     Value: !GetAtt [cloudfrontdistribution, DomainName]
-    Description: URL for website hosted on S3
+    Description: CloudFront Distribution Domain Name
   CFHostedZoneID:
     Value: !FindInMap [ RegionMap, "us-east-1", hostedzoneID]
-    Description: Name of S3 bucket to hold website content
+    Description: CloudFront Hosted ZoneID
   CFwebsiteendpoint:
     Value: !FindInMap [ RegionMap, "us-east-1", websiteendpoint]
-    Description: Name of S3 bucket to hold website content
+    Description: CloudFront WebSite Endpoint

@@ -9,7 +9,7 @@ Resources:
   myStackS3:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3-eu-west-1.amazonaws.com/infraestructura.dev/cloudformation/infraestructura/roberto/s3-static.yml
+      TemplateURL: https://s3-ap-northeast-1.amazonaws.com/infraestructura.lab/cloudformation/roberto/s3-static.yml
       Parameters:
         NameBucket: !Join 
         - '.'
@@ -19,9 +19,9 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: myStackS3
     Properties:
-      TemplateURL: https://s3-eu-west-1.amazonaws.com/infraestructura.dev/cloudformation/infraestructura/roberto/cloudfront.yml
+      TemplateURL: https://s3-ap-northeast-1.amazonaws.com/infraestructura.lab/cloudformation/roberto/cloudfront-cdn.yml
       Parameters:
-        CFOrigin: !GetAtt myStackS3.Outputs.DomainName
+        CFOrigin: !GetAtt myStackS3.Outputs.S3BucketDomainName
         CFAlias: !Join 
         - '.'
         - - !Ref SubDominio
@@ -30,13 +30,13 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: myStackCF
     Properties:
-      TemplateURL: https://s3-eu-west-1.amazonaws.com/infraestructura.dev/cloudformation/infraestructura/roberto/route53-domain.yml
+      TemplateURL: https://s3-ap-northeast-1.amazonaws.com/infraestructura.lab/cloudformation/roberto/route53-domain.yml
       Parameters:
         R53DomainName: !Ref Dominio
         R53SubDomainName: !Ref SubDominio
         R53HostedZoneId: !Ref HostedZoneId
-        ExtHostedZoneId: !GetAtt myStackCF.Outputs.hostedzoneID
-        ExtDNSName: !GetAtt myStackCF.Outputs.DomainName
+        ExtHostedZoneId: !GetAtt myStackCF.Outputs.CFHostedZoneID
+        ExtDNSName: !GetAtt myStackCF.Outputs.CFDomainName
 Outputs:
   StackRefS3:
     Value: !Ref myStackS3
